@@ -4,6 +4,7 @@ contract RowingEvents {
     event onEndRound
     (
         bool isEnded,
+        uint256 roundNumber,
         uint256 winnerBoatNumber,
         uint256 redPosition,
         uint256 yellowPosition,

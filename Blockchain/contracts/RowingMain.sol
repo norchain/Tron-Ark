@@ -99,6 +99,7 @@ contract RowingMain is RowingModular {
         potSplit_[2] = RowingDataSet.PotSplit(40,0);  //48% to winner, 10% to next round, 2% to com
         potSplit_[3] = RowingDataSet.PotSplit(40,0);  //48% to winner, 10% to next round, 2% to com
 
+        rID_ = 1;
         initSpeed = 1;
         redSpeed = initSpeed;
         yellowSpeed = initSpeed;
@@ -275,6 +276,8 @@ contract RowingMain is RowingModular {
 
         uint256 timeLeftForCurrentRound = getTimeLeft();
         if (timeLeftForCurrentRound == 0) {
+            _rID += 1;
+            rID_ += 1;
             bool isEnded = abs(redPosition - yellowPosition) > winningDistance 
                         || abs(redPosition - bluePosition) > winningDistance
                         || abs(bluePosition - yellowPosition) > winningDistance;
@@ -286,6 +289,7 @@ contract RowingMain is RowingModular {
             emit RowingEvents.onEndRound
             (
                 isEnded,
+                _rID,
                 winnerBoatNumber,
                 redPosition,
                 yellowPosition,
