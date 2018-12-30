@@ -269,6 +269,10 @@ contract RowingMain is RowingModular {
         bluePosition += (now - blueBoatRunTimeSinceLastPosition) * blueSpeed;
         blueSpeed = sqrt(initSpeed - blueBoatPlayerNumber * 0.01);
 
+        redBoatRunTimeSinceLastPosition = _now;
+        yellowBoatRunTimeSinceLastPosition = _now;
+        blueBoatRunTimeSinceLastPosition = _now;
+
         uint256 timeLeftForCurrentRound = getTimeLeft();
         if (timeLeftForCurrentRound == 0) {
             bool isEnded = abs(redPosition - yellowPosition) > winningDistance 
