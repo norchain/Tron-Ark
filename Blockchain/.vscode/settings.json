@@ -1,0 +1,4 @@
+{
+    "solidity.compileUsingRemoteVersion" : "v0.4.24",
+    "solidity.linter":false,
+}
