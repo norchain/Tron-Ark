@@ -1,6 +1,6 @@
 # Tron Ark
 
-中文版本说明见[这里]()
+中文版本说明见[这里](https://github.com/norchain/Rowing/blob/master/%E8%AF%BB%E6%88%91.md)
 
 
 
