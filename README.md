@@ -18,9 +18,9 @@ The game rule is simple with only one action: **Embark**. To do so, a player nee
 
 1. The proportions of the embarked crypto
 
-* **Pool Part**: 50% is deposited to the shared reward pool.
-* **Dividend Part**: 30% is deposited to all the existing passengers' accounts on the same ark immediately, following the ratio of each one's total investment.
-* **Restricted Part**: 15% is deposited to the passengers' accounts on the same ark, who embarked during the last cycle (see *Cycle* in bullet 3) while didn't vote for "restrict embarking".
+* **Pool Part**: 20% is deposited to the shared reward pool.
+* **Dividend Part**: 15% is deposited to all the existing passengers' accounts on the same ark immediately, following the ratio of each one's total investment.
+* **Restricted Part**: 60% is deposited to the passengers' accounts on the same ark, who embarked during the last cycle (see *Cycle* in bullet 3) while didn't vote for "restrict embarking".
 * **Referral Part**: The rest 5% is deposited to the referree and the developer equally. If the embarkment didn't denote a referree, all 5% are deposited to developer's account.
 2. Ark deceleration
 
@@ -38,3 +38,15 @@ The game rule is simple with only one action: **Embark**. To do so, a player nee
 When a cycle is ended, if the leading ark keeps the distance from the last ark with more than 10,000 miles for three continous cycles (including this cycle), the game ends.
 
 After the game ended, the crypto in the pool will be dispensed to all the passengers, with the ratio of the total investment they put onto the winner ark during the last 3 cycles.
+
+
+
+## Gameplay Analysis
+
+Comparing with the Famous Fomo3D, the restrict voting mechanism can ensure the later participants still be able to achieve high dividend.
+
+
+
+## The Team
+
+[Norchain.io](norchain.io) is a technology team based Toronto, Canada. The team members are professionals of blockchain, machine learning, cybersecurity and mobile internet. Norchain has won a lot of global develop competitions and hackathons. 
