@@ -18,9 +18,9 @@ The game rule is simple with only one action: **Embark**. To do so, a player nee
 
 1. The proportions of the embarked crypto
 
-* **Pool Part**: 60% is deposited to the shared reward pool.
-* **Dividend Part**: 25% is deposited to all the existing passengers' accounts on the same ark immediately, following the ratio of each one's total investment.
-* **Restricted Part**: 10% is deposited to the passengers' accounts on the same ark, who embarked during the last cycle (see *Cycle* in bullet 3) while didn't vote for "restrict embarking".
+* **Pool Part**: 50% is deposited to the shared reward pool.
+* **Dividend Part**: 30% is deposited to all the existing passengers' accounts on the same ark immediately, following the ratio of each one's total investment.
+* **Restricted Part**: 15% is deposited to the passengers' accounts on the same ark, who embarked during the last cycle (see *Cycle* in bullet 3) while didn't vote for "restrict embarking".
 * **Referral Part**: The rest 5% is deposited to the referree and the developer equally. If the embarkment didn't denote a referree, all 5% are deposited to developer's account.
 2. Ark deceleration
 
