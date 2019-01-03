@@ -70,8 +70,6 @@ contract RowingMain is RowingModular {
     // ****************
     // TEAM FEE DATA , Team的费用分配数据
     // ****************
-    mapping (uint256 => RowingDataSet.TeamFee) public fees_;          // (team => fees) fee distribution by team
-    mapping (uint256 => RowingDataSet.PotSplit) public potSplit_;     // (team => fees) pot split distribution by team
 
     constructor()
         public
@@ -80,18 +78,7 @@ contract RowingMain is RowingModular {
         // 0 = red boat
         // 1 = yellow boat
         // 2 = blue boat
-
-        //     Referrals / Community rewards are mathematically designed to come from the winner's share of the pot.
-        fees_[0] = RowingDataSet.TeamFee(36,0);   //50% to pot, 10% to aff, 2% to com, 1% to pot swap, 1% to air drop pot
-        fees_[1] = RowingDataSet.TeamFee(43,0);   //43% to pot, 10% to aff, 2% to com, 1% to pot swap, 1% to air drop pot
-        fees_[2] = RowingDataSet.TeamFee(66,0);  //20% to pot, 10% to aff, 2% to com, 1% to pot swap, 1% to air drop pot
-        fees_[3] = RowingDataSet.TeamFee(51,0);   //35% to pot, 10% to aff, 2% to com, 1% to pot swap, 1% to air drop pot
-        
-        // how to split up the final pot based on which team was picked
-        potSplit_[0] = RowingDataSet.PotSplit(25,0);  //48% to winner, 25% to next round, 2% to com
-        potSplit_[1] = RowingDataSet.PotSplit(25,0);   //48% to winner, 25% to next round, 2% to com
-        potSplit_[2] = RowingDataSet.PotSplit(40,0);  //48% to winner, 10% to next round, 2% to com
-        potSplit_[3] = RowingDataSet.PotSplit(40,0);  //48% to winner, 10% to next round, 2% to com
+        // 3 = green boat
 
         rID_ = 1;
         initSpeed = 10;

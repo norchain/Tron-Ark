@@ -42,12 +42,4 @@ library RowingDataSet {
         uint256 icoAvg; // average key price for ICO phase
     }
     
-    struct TeamFee {
-        uint256 gen;    // % of buy in thats paid to key holders of current round
-        uint256 p3d;    // % of buy in thats paid to p3d holders
-    }
-    struct PotSplit {
-        uint256 gen;    // % of pot thats paid to key holders of current round
-        uint256 p3d;    // % of pot thats paid to p3d holders
-    }
 }
