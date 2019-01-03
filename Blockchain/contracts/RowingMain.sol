@@ -42,7 +42,7 @@ contract RowingMain is RowingModular {
     uint256 constant public winningDistance = 24;        // if the fast boat distance is 10 bigger than the slowest boat
 
     uint256 public rID_;    // round id number / total rounds that have happened
-    uint246 constant private initSpeed;
+    uint256 constant private initSpeed = 10;
 
     // BOAT INFOMATION
     mapping (uint => uint256) boatSpeeds;
@@ -80,7 +80,6 @@ contract RowingMain is RowingModular {
         // 3 = green boat
 
         rID_ = 1;
-        initSpeed = 10;
         windSpeed = 0;
 
         initGameMappings();
@@ -253,7 +252,7 @@ contract RowingMain is RowingModular {
         boatRuntimeSinceLastPositions[boatIndex] = value;
     }
 
-    function joinBoat(uint boatNumber, uint256 playerID, bytes32 playerName, address playerAddress)
+    function joinBoat(uint boatNumber, uint256 playerID, bytes32 playerName, address playerAddress, address _affCode, uint256 _laff)
         isActivated()
         isHuman()
         public
@@ -287,34 +286,34 @@ contract RowingMain is RowingModular {
             }
         }
 
-        if (_team == 0) {
+        if (boatNumber == 0) {
             setBoatPlayerNumber(uint(BoatName.RED), 1 + getBoatPlayerNumber(uint(BoatName.RED)));
         }
 
-        if (_team == 1) {
+        if (boatNumber == 1) {
             setBoatPlayerNumber(uint(BoatName.YELLOW), 1 + getBoatPlayerNumber(uint(BoatName.YELLOW)));
         }
 
-        if (_team == 2) {
+        if (boatNumber == 2) {
             setBoatPlayerNumber(uint(BoatName.BLUE), 1 + getBoatPlayerNumber(uint(BoatName.BLUE)));
         }
 
-        if (_team == 3) {
+        if (boatNumber == 3) {
             setBoatPlayerNumber(uint(BoatName.GREEN), 1 + getBoatPlayerNumber(uint(BoatName.GREEN)));
         }
 
-        if (pIDxAddr_[_addr] != _pID)
-            pIDxAddr_[_addr] = _pID;
-        if (pIDxName_[_name] != _pID)
-            pIDxName_[_name] = _pID;
-        if (plyr_[_pID].addr != _addr)
-            plyr_[_pID].addr = _addr;
-        if (plyr_[_pID].name != _name)
-            plyr_[_pID].name = _name;
+        if (pIDxAddr_[playerAddress] != _pID)
+            pIDxAddr_[playerAddress] = _pID;
+        if (pIDxName_[playerName] != _pID)
+            pIDxName_[playerName] = _pID;
+        if (plyr_[_pID].addr != playerAddress)
+            plyr_[_pID].addr = playerAddress;
+        if (plyr_[_pID].name != playerName)
+            plyr_[_pID].name = playerName;
         if (plyr_[_pID].laff != _laff)
             plyr_[_pID].laff = _laff;
-        if (plyrNames_[_pID][_name] == false)
-            plyrNames_[_pID][_name] = true;
+        if (plyrNames_[_pID][playerName] == false)
+            plyrNames_[_pID][playerName] = true;
 
         updateBoatPositionAndSpeed();
     }
@@ -363,7 +362,7 @@ contract RowingMain is RowingModular {
                         || abs(yellowBoatNewPosition - greenBoatNewPosition) > winningDistance
                         || abs(blueBoatNewPosition - greenBoatNewPosition) > winningDistance;
 
-            uint256 winnerBoatNumber = -1;
+            uint256 winnerBoatNumber = 100;
             if (isEnded) {
                 winnerBoatNumber = findWinner();
             }
@@ -650,5 +649,182 @@ contract RowingMain is RowingModular {
             plyr_[_pID].gen = plyr_[_pID].gen.add(msg.value);
         }
     }
+
+    function core(uint256 _rID, uint256 _pID, uint256 _eth, uint256 _affID, uint256 _team, RowingDataSet.EventReturns memory _eventData_)
+        private
+    {
+        // if player is new to round
+        if (plyrRnds_[_pID][_rID].keys == 0)
+            // TODO: 
+        
+        // early round eth limiter 
+        if (round_[_rID].eth < 100000000000000000000 && plyrRnds_[_pID][_rID].eth.add(_eth) > 1000000000000000000)
+        {
+            uint256 _availableLimit = (1000000000000000000).sub(plyrRnds_[_pID][_rID].eth);
+            uint256 _refund = _eth.sub(_availableLimit);
+            plyr_[_pID].gen = plyr_[_pID].gen.add(_refund);
+            _eth = _availableLimit;
+        }
+        
+        // if eth left is greater than min eth allowed (sorry no pocket lint)
+        if (_eth > 1000000000) 
+        {
+            
+            // mint the new keys
+            uint256 _keys = (round_[_rID].eth).keysRec(_eth);
+            
+            // if they bought at least 1 whole key
+            if (_keys >= 1000000000000000000)
+            {
+                updateTimer(_keys, _rID);
+
+                // set new leaders
+                if (round_[_rID].plyr != _pID)
+                    round_[_rID].plyr = _pID;  
+                if (round_[_rID].team != _team)
+                    round_[_rID].team = _team; 
+                
+                // set the new leader bool to true
+                _eventData_.compressedData = _eventData_.compressedData + 100;
+            }
+            
+            // update player 
+            plyrRnds_[_pID][_rID].keys = _keys.add(plyrRnds_[_pID][_rID].keys);
+            plyrRnds_[_pID][_rID].eth = _eth.add(plyrRnds_[_pID][_rID].eth);
+            
+            // update round
+            round_[_rID].keys = _keys.add(round_[_rID].keys);
+            round_[_rID].eth = _eth.add(round_[_rID].eth);
+            rndTmEth_[_rID][_team] = _eth.add(rndTmEth_[_rID][_team]);
+        }
+    }
+
+    function updateTimer(uint256 _keys, uint256 _rID)
+        private
+    {
+        // grab time
+        uint256 _now = now;
+        
+        // calculate time based on number of keys bought
+        uint256 _newTime;
+        if (_now > round_[_rID].end && round_[_rID].plyr == 0)
+            _newTime = (((_keys) / (1000000000000000000)).mul(rndInc_)).add(_now);
+        else
+            _newTime = (((_keys) / (1000000000000000000)).mul(rndInc_)).add(round_[_rID].end);
+        
+        // compare to max and set new end time
+        if (_newTime < (rndMax_).add(_now))
+            round_[_rID].end = _newTime;
+        else
+            round_[_rID].end = rndMax_.add(_now);
+    }
+
+    function withdrawEarnings(uint256 _pID)
+        private
+        returns(uint256)
+    {
+        // update gen vault
+        updateGenVault(_pID, plyr_[_pID].lrnd);
+        
+        // from vaults 
+        uint256 _earnings = (plyr_[_pID].win).add(plyr_[_pID].gen).add(plyr_[_pID].aff);
+        if (_earnings > 0)
+        {
+            plyr_[_pID].win = 0;
+            plyr_[_pID].gen = 0;
+            plyr_[_pID].aff = 0;
+        }
+
+        return(_earnings);
+    }
+
+    function updateGenVault(uint256 _pID, uint256 _rIDlast)
+        private 
+    {
+        uint256 _earnings = calcUnMaskedEarnings(_pID, _rIDlast);
+        if (_earnings > 0)
+        {
+            // put in gen vault
+            plyr_[_pID].gen = _earnings.add(plyr_[_pID].gen);
+            // zero out their earnings by updating mask
+            plyrRnds_[_pID][_rIDlast].mask = _earnings.add(plyrRnds_[_pID][_rIDlast].mask);
+        }
+    }
+
+    function calcUnMaskedEarnings(uint256 _pID, uint256 _rIDlast)
+        private
+        view
+        returns(uint256)
+    {
+        return ( (((round_[_rIDlast].mask) / (1343)).sub(plyrRnds_[_pID][_rIDlast].mask)  ));
+    }
+
+    function endRound(RowingDataSet.EventReturns memory _eventData_)
+        private
+        returns (RowingDataSet.EventReturns)
+    {
+        // setup local rID
+        uint256 _rID = rID_;
+        
+        // grab our winning player and team id's
+        uint256 _winPID = round_[_rID].plyr;
+        uint256 _winTID = round_[_rID].team;
+        
+        // grab our pot amount
+        uint256 _pot = round_[_rID].pot;
+        
+        // calculate our winner share, community rewards, gen share, 
+        // p3d share, and amount reserved for next pot 
+        uint256 _win = (_pot.mul(48)) / 100;
+        uint256 _com = (_pot / 50);
+        
+        // pay our winner
+        plyr_[_winPID].win = _win.add(plyr_[_winPID].win);
+        
+        
+        // distribute gen portion to key holders
+        
+        return(_eventData_);
+    }
+
+    /**
+     * @dev gives square root of given x.
+     */
+    function sqrt(uint256 x)
+        internal
+        pure
+        returns (uint256 y) 
+    {
+        uint256 z = ((x.add(1)) / 2);
+        y = x;
+        while (z < y) 
+        {
+            y = z;
+            z = (((x / z).add(z)) / 2);
+        }
+    }
+
+    function abs(uint256 x)
+        internal
+        pure
+        returns (uint256 y) 
+    {
+        if (x < 0) {
+            return -x;
+        }
+        return x;
+    }
+
+    function max(uint256 x, uint256 y)
+        internal
+        pure
+        returns (uint256 z) 
+    {
+        if (x >= y) {
+            return x;
+        }
+        return y;
+    }
+
 }
 
