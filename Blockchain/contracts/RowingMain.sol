@@ -347,15 +347,19 @@ contract RowingMain is RowingModular {
 
         uint256 redBoatNewPosition = getBoatPosition(uint(BoatName.RED)) + (now - getBoatRuntimeSinceLastPositions(uint(BoatName.RED))) * getBoatSpeed(uint(BoatName.RED));
         setBoatPosition(uint(BoatName.RED), redBoatNewPosition);
+        setBoatSpeed(uint(BoatName.RED), uint256(sqrt(initSpeed - getBoatSpeed(uint(BoatName.RED)))));
 
         uint256 yellowBoatNewPosition = getBoatPosition(uint(BoatName.YELLOW)) + (now - getBoatRuntimeSinceLastPositions(uint(BoatName.YELLOW))) * getBoatSpeed(uint(BoatName.YELLOW));
         setBoatPosition(uint(BoatName.YELLOW), yellowBoatNewPosition);
+        setBoatSpeed(uint(BoatName.YELLOW), uint256(sqrt(initSpeed - getBoatSpeed(uint(BoatName.YELLOW)))));
 
         uint256 blueBoatNewPosition = getBoatPosition(uint(BoatName.BLUE)) + (now - getBoatRuntimeSinceLastPositions(uint(BoatName.BLUE))) * getBoatSpeed(uint(BoatName.BLUE));
         setBoatPosition(uint(BoatName.BLUE), blueBoatNewPosition);
+        setBoatSpeed(uint(BoatName.BLUE), uint256(sqrt(initSpeed - getBoatSpeed(uint(BoatName.BLUE)))));
 
         uint256 greenBoatNewPosition = getBoatPosition(uint(BoatName.GREEN)) + (now - getBoatRuntimeSinceLastPositions(uint(BoatName.GREEN))) * getBoatSpeed(uint(BoatName.GREEN));
         setBoatPosition(uint(BoatName.GREEN), greenBoatNewPosition);
+        setBoatSpeed(uint(BoatName.GREEN), uint256(sqrt(initSpeed - getBoatSpeed(uint(BoatName.GREEN)))));
 
         setBoatRuntimeSinceLastPositions(uint(BoatName.RED), _now);
         setBoatRuntimeSinceLastPositions(uint(BoatName.YELLOW), _now);
