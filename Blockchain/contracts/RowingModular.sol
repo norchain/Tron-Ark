@@ -1,5 +1,5 @@
 pragma solidity ^0.4.24;
 
-import "./RowingEvent.sol";
+import "./RowingEvents.sol";
 
 contract RowingModular is RowingEvents {}

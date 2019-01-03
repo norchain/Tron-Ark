@@ -71,7 +71,7 @@ contract RowingEvents {
         uint256 genAmount
     );
     
-    // (fomo3d long only) fired whenever a player tries a buy after round timer 
+    // fired whenever a player tries a buy after round timer 
     // hit zero, and causes end round to be ran.
     event onBuyAndDistribute
     (
@@ -88,7 +88,7 @@ contract RowingEvents {
         uint256 genAmount
     );
     
-    // (fomo3d long only) fired whenever a player tries a reload after round timer 
+    // fired whenever a player tries a reload after round timer 
     // hit zero, and causes end round to be ran.
     event onReLoadAndDistribute
     (
