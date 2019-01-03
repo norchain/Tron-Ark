@@ -560,7 +560,7 @@ contract RowingMain is RowingModular {
         pure
         returns (uint256)
     {
-        if (_team < uint(BoatName.RED) || _team > 4)
+        if (_team < uint(BoatName.RED) || _team > uint(BoatName.GREEN))
             return(0);
         else
             return(_team);
