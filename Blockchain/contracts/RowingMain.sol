@@ -16,6 +16,8 @@ import "./RowingEvents.sol";
 import "./RowingModular.sol";
 
 contract RowingMain is RowingModular {
+    enum BoatName { RED, YELLOW, BLUE, GREEN }
+
     using SafeMath for *;
     using NameFilter for string;
     using RowingKeysCalcLong for uint256;
@@ -38,26 +40,19 @@ contract RowingMain is RowingModular {
     uint256 constant private rndInc_ = 30 seconds;              // every full key purchased adds this much to the timer
     uint256 constant private rndMax_ = 24 hours;                // max length a round timer can be
 
-    uint256 constant public winningDistance = 10;        // if the fast boat distance is 10 bigger than the slowest boat
+    uint256 constant public winningDistance = 24;        // if the fast boat distance is 10 bigger than the slowest boat
 
     uint256 public rID_;    // round id number / total rounds that have happened
     uint246 constant private initSpeed;
-    uint256 public redSpeed; // initial boat speed
-    uint256 public yellowSpeed; // initial boat speed
-    uint256 public blueSpeed; // initial boat speed
+
+    mapping (uint => uint256) boatSpeeds;
+    mapping (uint => uint256) boatPositions;
+    mapping (uint => uint256) boatPlayNumbers;
+    mapping (uint => uint256) boatRuntimeSinceLastPositions;
+
+    uint256[4] private boatSpeed = [0,0,0,0]; // red, yellow, blue, green respectively
+
     int256 public windSpeed;
-
-    uint256 public redPosition;
-    uint256 public yellowPosition;
-    uint256 public bluePosition;
-
-    uint256 private redBoatPlayerNumber;
-    uint256 private yellowBoatPlayerNumber;
-    uint256 private blueBoatPlayerNumber;
-
-    uint256 private redBoatRunTimeSinceLastPosition;
-    uint256 private yellowBoatRunTimeSinceLastPosition;
-    uint256 private blueBoatRunTimeSinceLastPosition;
 
     // PLAYER DATA 
     //****************
@@ -100,35 +95,26 @@ contract RowingMain is RowingModular {
         potSplit_[3] = RowingDataSet.PotSplit(40,0);  //48% to winner, 10% to next round, 2% to com
 
         rID_ = 1;
-        initSpeed = 1;
-        redSpeed = initSpeed;
-        yellowSpeed = initSpeed;
-        blueSpeed = initSpeed;
+        initSpeed = 10;
+        
+        initGameMappings();
 
         windSpeed = 0;
 
-        redPosition = 0;
-        yellowPosition = 0;
-        bluePosition = 0;
-
-        redBoatPlayerNumber = 0;
-        yellowBoatPlayerNumber = 0;
-        blueBoatPlayerNumber = 0;
-
-        redBoatRunTimeSinceLastPosition = 0;
-        yellowBoatRunTimeSinceLastPosition = 0;
-        blueBoatRunTimeSinceLastPosition = 0;
-
         if (msg.value == 0) {
-            redBoatPlayerNumber += 1;
+            setBoatPlayerNumber(uint(BoatName.RED), 1);
         }
 
         if (msg.value == 1) {
-            yellowBoatPlayerNumber += 1;
+            setBoatPlayerNumber(uint(BoatName.YELLOW), 1);
         }
 
         if (msg.value == 2) {
-            blueBoatPlayerNumber += 1;
+            setBoatPlayerNumber(uint(BoatName.BLUE), 1);
+        }
+
+        if (msg.value == 3) {
+            setBoatPlayerNumber(uint(BoatName.GREEN), 1);
         }
         
     }
@@ -185,12 +171,109 @@ contract RowingMain is RowingModular {
         buyCore(_pID, plyr_[_pID].laff, 2, _eventData_);
     }
 
-    function joinBoat(uint256 boatNumber, uint256 playerID, bytes32 playerName, address playerAddress)
+    function initGameMappings()
+        private
+    {
+        boatSpeeds[uint(BoatName.RED)] = 0;
+        boatSpeeds[uint(BoatName.YELLOW)] = 0;
+        boatSpeeds[uint(BoatName.BLUE)] = 0;
+        boatSpeeds[uint(BoatName.GREEN)] = 0;
+
+        boatPositions[uint(BoatName.RED)] = 0;
+        boatPositions[uint(BoatName.YELLOW)] = 0;
+        boatPositions[uint(BoatName.BLUE)] = 0;
+        boatPositions[uint(BoatName.GREEN)] = 0;
+
+        boatPlayNumbers[uint(BoatName.RED)] = 0;
+        boatPlayNumbers[uint(BoatName.YELLOW)] = 0;
+        boatPlayNumbers[uint(BoatName.BLUE)] = 0;
+        boatPlayNumbers[uint(BoatName.GREEN)] = 0;
+
+        boatRuntimeSinceLastPositions[uint(BoatName.RED)] = 0;
+        boatRuntimeSinceLastPositions[uint(BoatName.YELLOW)] = 0;
+        boatRuntimeSinceLastPositions[uint(BoatName.BLUE)] = 0;
+        boatRuntimeSinceLastPositions[uint(BoatName.GREEN)] = 0;
+    }
+
+    function getBoatSpeed(uint boatIndex) 
+        private
+        pure 
+        returns (uint256)
+    {
+        require(uint(BoatName.GREEN) >= boatIndex && 0 <= boatIndex, "index should be valid");
+
+        return boatSpeeds[boatIndex];
+    }
+
+    function setBoatSpeed(uint boatIndex, uint256 value)
+        private
+    {
+        require(uint(BoatName.GREEN) >= boatIndex && 0 <= boatIndex, "index should be valid");
+
+        boatSpeeds[boatIndex] = value;
+    }
+
+    function getBoatPosition(uint boatIndex) 
+        private
+        pure 
+        returns (uint256)
+    {
+        require(uint(BoatName.GREEN) >= boatIndex && 0 <= boatIndex, "index should be valid");
+
+        return boatPositions[boatIndex];
+    }
+
+    function setBoatPosition(uint boatIndex, uint256 value)
+        private
+    {
+        require(uint(BoatName.GREEN) >= boatIndex && 0 <= boatIndex, "index should be valid");
+
+        boatPositions[boatIndex] = value;
+    }
+
+    function getBoatPlayerNumber(uint boatIndex) 
+        private
+        pure 
+        returns (uint256)
+    {
+        require(uint(BoatName.GREEN) >= boatIndex && 0 <= boatIndex, "index should be valid");
+
+        return boatPlayNumbers[boatIndex];
+    }
+
+    function setBoatPlayerNumber(uint boatIndex, uint256 value)
+        private
+    {
+        require(uint(BoatName.GREEN) >= boatIndex && 0 <= boatIndex, "index should be valid");
+
+        boatPlayNumbers[boatIndex] = value;
+    }
+
+    function getBoatRuntimeSinceLastPositions(uint boatIndex) 
+        private
+        pure 
+        returns (uint256)
+    {
+        require(uint(BoatName.GREEN) >= boatIndex && 0 <= boatIndex, "index should be valid");
+
+        return boatRuntimeSinceLastPositions[boatIndex];
+    }
+
+    function setBoatRuntimeSinceLastPositions(uint boatIndex, uint256 value)
+        private
+    {
+        require(uint(BoatName.GREEN) >= boatIndex && 0 <= boatIndex, "index should be valid");
+
+        boatRuntimeSinceLastPositions[boatIndex] = value;
+    }
+
+    function joinBoat(uint boatNumber, uint256 playerID, bytes32 playerName, address playerAddress)
         isActivated()
         isHuman()
         public
     {
         require (msg.sender == address(PlayerBook), "your not playerNames contract... hmmm..");
+        require(uint(BoatName.GREEN) >= boatNumber && 0 <= boatNumber, "index should be valid");
         // set up our tx event data and determine if player is new or not
         RowingDataSet.EventReturns memory _eventData_ = determinePID(_eventData_);
         
@@ -261,26 +344,33 @@ contract RowingMain is RowingModular {
         // grab time
         uint256 _now = now;
 
-        redPosition += (now - redBoatRunTimeSinceLastPosition) * redSpeed;
-        redSpeed = sqrt(initSpeed - redBoatPlayerNumber * 0.01);
+        uint256 redBoatNewPosition = getBoatPosition(uint(BoatName.RED)) + (now - getBoatRuntimeSinceLastPositions(uint(BoatName.RED))) * getBoatSpeed(uint(BoatName.RED));
+        setBoatPosition(uint(BoatName.RED), redBoatNewPosition);
 
-        yellowPosition += (now - yellowBoatRunTimeSinceLastPosition) * yellowSpeed;
-        yellowSpeed = sqrt(initSpeed - yellowBoatPlayerNumber * 0.01);
+        uint256 yellowBoatNewPosition = getBoatPosition(uint(BoatName.YELLOW)) + (now - getBoatRuntimeSinceLastPositions(uint(BoatName.YELLOW))) * getBoatSpeed(uint(BoatName.YELLOW));
+        setBoatPosition(uint(BoatName.YELLOW), yellowBoatNewPosition);
 
-        bluePosition += (now - blueBoatRunTimeSinceLastPosition) * blueSpeed;
-        blueSpeed = sqrt(initSpeed - blueBoatPlayerNumber * 0.01);
+        uint256 blueBoatNewPosition = getBoatPosition(uint(BoatName.BLUE)) + (now - getBoatRuntimeSinceLastPositions(uint(BoatName.BLUE))) * getBoatSpeed(uint(BoatName.BLUE));
+        setBoatPosition(uint(BoatName.BLUE), blueBoatNewPosition);
 
-        redBoatRunTimeSinceLastPosition = _now;
-        yellowBoatRunTimeSinceLastPosition = _now;
-        blueBoatRunTimeSinceLastPosition = _now;
+        uint256 greenBoatNewPosition = getBoatPosition(uint(BoatName.GREEN)) + (now - getBoatRuntimeSinceLastPositions(uint(BoatName.GREEN))) * getBoatSpeed(uint(BoatName.GREEN));
+        setBoatPosition(uint(BoatName.GREEN), greenBoatNewPosition);
+
+        setBoatRuntimeSinceLastPositions(uint(BoatName.RED), _now);
+        setBoatRuntimeSinceLastPositions(uint(BoatName.YELLOW), _now);
+        setBoatRuntimeSinceLastPositions(uint(BoatName.BLUE), _now);
+        setBoatRuntimeSinceLastPositions(uint(BoatName.GREEN), _now);
 
         uint256 timeLeftForCurrentRound = getTimeLeft();
         if (timeLeftForCurrentRound == 0) {
             _rID += 1;
             rID_ += 1;
-            bool isEnded = abs(redPosition - yellowPosition) > winningDistance 
-                        || abs(redPosition - bluePosition) > winningDistance
-                        || abs(bluePosition - yellowPosition) > winningDistance;
+            bool isEnded = abs(redBoatNewPosition - yellowBoatNewPosition) > winningDistance 
+                        || abs(redBoatNewPosition - blueBoatNewPosition) > winningDistance
+                        || abs(redBoatNewPosition - greenBoatNewPosition) > winningDistance
+                        || abs(yellowBoatNewPosition - blueBoatNewPosition) > winningDistance
+                        || abs(yellowBoatNewPosition - greenBoatNewPosition) > winningDistance
+                        || abs(blueBoatNewPosition - greenBoatNewPosition) > winningDistance;
 
             uint256 winnerBoatNumber = -1;
             if (isEnded) {
@@ -291,9 +381,10 @@ contract RowingMain is RowingModular {
                 isEnded,
                 _rID,
                 winnerBoatNumber,
-                redPosition,
-                yellowPosition,
-                bluePosition
+                redBoatNewPosition,
+                yellowBoatNewPosition,
+                blueBoatNewPosition,
+                greenBoatNewPosition
             );
         }
     }
@@ -304,14 +395,21 @@ contract RowingMain is RowingModular {
     {
         uint256 winner;
 
-        uint256 fastestPosition = max(max(redPosition, yellowPosition), bluePosition);
-        if (fastestPosition == redPosition) {
+        uint256 currentRedPosition = getBoatPosition(uint(BoatName.RED));
+        uint256 currentYellowPosition = getBoatPosition(uint(BoatName.YELLOW));
+        uint256 currentBluePosition = getBoatPosition(uint(BoatName.BLUE));
+        uint256 currentGreenPosition = getBoatPosition(uint(BoatName.GREEN));
+        uint256 fastestPosition = max(max(max(currentRedPosition, currentYellowPosition), currentBluePosition), currentGreenPosition);
+        if (fastestPosition == currentRedPosition) {
             winner = 0;
         }
-        if (fastestPosition == yellowPosition) {
+        if (fastestPosition == currentYellowPosition) {
             winner = 1;
         }
-        if (fastestPosition == bluePosition) {
+        if (fastestPosition == currentBluePosition) {
+            winner = 2;
+        }
+        if (fastestPosition == currentGreenPosition) {
             winner = 2;
         }
         return winner;

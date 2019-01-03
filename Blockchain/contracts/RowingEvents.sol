@@ -8,7 +8,8 @@ contract RowingEvents {
         uint256 winnerBoatNumber,
         uint256 redPosition,
         uint256 yellowPosition,
-        uint256 bluePosition
+        uint256 bluePosition,
+        uint256 greenPosition
     );
 
     // fired whenever a player registers a name
