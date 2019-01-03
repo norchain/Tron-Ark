@@ -47,7 +47,7 @@ import "./library/RowingDataSet.sol";
 
 import "./interface/TeamInterface.sol";
 import "./interface/FundForwarderInterface.sol";
-import "./interface/PlayerBookReceiverInterface.sol";
+
 
 
 contract Team {
