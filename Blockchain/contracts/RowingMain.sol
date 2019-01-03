@@ -45,12 +45,11 @@ contract RowingMain is RowingModular {
     uint256 public rID_;    // round id number / total rounds that have happened
     uint246 constant private initSpeed;
 
+    // BOAT INFOMATION
     mapping (uint => uint256) boatSpeeds;
     mapping (uint => uint256) boatPositions;
     mapping (uint => uint256) boatPlayNumbers;
     mapping (uint => uint256) boatRuntimeSinceLastPositions;
-
-    uint256[4] private boatSpeed = [0,0,0,0]; // red, yellow, blue, green respectively
 
     int256 public windSpeed;
 
@@ -96,10 +95,10 @@ contract RowingMain is RowingModular {
 
         rID_ = 1;
         initSpeed = 10;
-        
+        windSpeed = 0;
+
         initGameMappings();
 
-        windSpeed = 0;
 
         if (msg.value == 0) {
             setBoatPlayerNumber(uint(BoatName.RED), 1);
@@ -195,6 +194,7 @@ contract RowingMain is RowingModular {
         boatRuntimeSinceLastPositions[uint(BoatName.GREEN)] = 0;
     }
 
+    // MARK: Helper functions getting and setting boats infos
     function getBoatSpeed(uint boatIndex) 
         private
         pure 
