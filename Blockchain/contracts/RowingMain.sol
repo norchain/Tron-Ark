@@ -115,7 +115,7 @@ contract RowingMain is RowingModular {
     }
     
     /**
-     * @dev prevents contracts from interacting with fomo3d 
+     * @dev prevents contracts from interacting
      */
     modifier isHuman() {
         address _addr = msg.sender;
@@ -416,7 +416,7 @@ contract RowingMain is RowingModular {
         returns (RowingDataSet.EventReturns)
     {
         uint256 _pID = pIDxAddr_[msg.sender];
-        // if player is new to this version of fomo3d
+        // if player is new to this version
         if (_pID == 0)
         {
             // grab their player ID, name and last aff ID, from player names contract 
