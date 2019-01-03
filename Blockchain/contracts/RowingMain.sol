@@ -300,20 +300,21 @@ contract RowingMain is RowingModular {
                 plyr_[_pID].laff = _affID;
             }
         }
-        
-        // verify a valid team was selected
-        _team = verifyTeam(boatNumber);
 
         if (_team == 0) {
-            redBoatPlayerNumber += 1;
+            setBoatPlayerNumber(uint(BoatName.RED), 1 + getBoatPlayerNumber(uint(BoatName.RED)));
         }
 
         if (_team == 1) {
-            yellowBoatPlayerNumber += 1;
+            setBoatPlayerNumber(uint(BoatName.YELLOW), 1 + getBoatPlayerNumber(uint(BoatName.YELLOW)));
         }
 
         if (_team == 2) {
-            blueBoatPlayerNumber += 1;
+            setBoatPlayerNumber(uint(BoatName.BLUE), 1 + getBoatPlayerNumber(uint(BoatName.BLUE)));
+        }
+
+        if (_team == 3) {
+            setBoatPlayerNumber(uint(BoatName.GREEN), 1 + getBoatPlayerNumber(uint(BoatName.GREEN)));
         }
 
         if (pIDxAddr_[_addr] != _pID)
