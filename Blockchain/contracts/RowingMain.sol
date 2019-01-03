@@ -3,7 +3,6 @@ pragma solidity ^0.4.24;
 import "./interface/otherRowing.sol";
 import "./interface/FundForwarderInterface.sol";
 import "./interface/PlayerBookInterface.sol";
-import "./interface/HourglassInterface.sol";
 
 import "../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./library/UintCompressor.sol";
@@ -25,7 +24,7 @@ contract RowingMain is RowingModular {
     // todo: replace address
     address constant private DEV_1_ADDRESS = 0x006B332340d355280B3F7aa2b33ea0AB0f5706E9;
 	
-    otherRowing private otherF3D_;
+   
     // todo: replace address
     FundForwarderInterface constant private FundForwarder = FundForwarderInterface(0x884b2e7e1A722f03BcEa664852b33b4Eb715344e);
     PlayerBookInterface constant private PlayerBook = PlayerBookInterface(0x3e59be3531955757F69bF36a68Bc25D8D740ff3a);
@@ -495,7 +494,7 @@ contract RowingMain is RowingModular {
         if (_now > round_[_rID].end && round_[_rID].ended == false && round_[_rID].plyr != 0)
         {
             // set up our tx event data
-            F3Ddatasets.EventReturns memory _eventData_;
+            RowingDataSet.EventReturns memory _eventData_;
             
             // end the round (distributes pot)
 			round_[_rID].ended = true;
@@ -602,7 +601,7 @@ contract RowingMain is RowingModular {
      * @dev logic runs whenever a buy order is executed.  determines how to handle 
      * incoming eth depending on if we are in an active round or not
      */
-    function buyCore(uint256 _pID, uint256 _affID, uint256 _team, F3Ddatasets.EventReturns memory _eventData_)
+    function buyCore(uint256 _pID, uint256 _affID, uint256 _team, RowingDataSet.EventReturns memory _eventData_)
         private
     {
         // setup local rID
